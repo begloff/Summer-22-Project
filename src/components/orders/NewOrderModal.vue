@@ -48,7 +48,11 @@
             <hr>
             <label for="cash">Cash Order: </label>
             <input type="checkbox" id="cash" v-model="currentOrder.cash" style="height: 20px;">
-            <button :disabled="!currentOrder.price || !currentOrder.name" @click="submitOrder">Submit Order</button>
+            <label for="cash">Hall Staff Order: </label>
+            <input type="checkbox" id="cash" v-model="hallStaffOrder" @click="hallStaffCheckBox" style="height: 20px;">
+
+            <hr>
+            <button :disabled="(!currentOrder.price && !hallStaffOrder) || !currentOrder.name" @click="submitOrder">Submit Order</button>
 
             <p v-if="dayOfWeek > 4" style="color: red;">Warning: Atypical Operation Day!</p>
 
@@ -76,7 +80,7 @@ export default {
             }
 
             this.filteredCustomers = this.customers.filter( customer => {
-                return customer.toLowerCase().startsWith(this.currentOrder.name.toLowerCase());
+                return customer.toLowerCase().includes(this.currentOrder.name.toLowerCase());
             })
         },
 
@@ -93,81 +97,92 @@ export default {
 
             this.currentOrder.items.push(item)
 
-            switch(item){
-                case 'DubBuff':
-                    this.currentOrder.price += 5
-                    break
-                case 'SingleBuff':
-                    this.currentOrder.price += 3
-                    break
-                case 'DubBuff - HS':
-                    this.currentOrder.price += 5
-                    break
-                case 'SingleBuff - HS':
-                    this.currentOrder.price += 3
-                    break
-                case 'CBR':
-                    this.currentOrder.price += 5
-                    break
-                case 'Cheese Nachos':
-                    this.currentOrder.price += 2.50
-                    break
-                case 'Chicken Nachos':
-                    this.currentOrder.price += 3.50
-                    break
-                case 'Single CBR':
-                    this.currentOrder.price += 3
-                    break
-                case 'Soda/Gatorade':
-                    this.currentOrder.price += 1.50
-                    break                    
-                case 'Ice Cream Sandwich':
-                    this.currentOrder.price += 1.50
-                    break
+            if(!this.hallStaffOrder){
 
+                switch(item){
+                    case 'DubBuff':
+                        this.currentOrder.price += 5
+                        break
+                    case 'SingleBuff':
+                        this.currentOrder.price += 3
+                        break
+                    case 'DubBuff - HS':
+                        this.currentOrder.price += 5
+                        break
+                    case 'SingleBuff - HS':
+                        this.currentOrder.price += 3
+                        break
+                    case 'CBR':
+                        this.currentOrder.price += 5
+                        break
+                    case 'Cheese Nachos':
+                        this.currentOrder.price += 2.50
+                        break
+                    case 'Chicken Nachos':
+                        this.currentOrder.price += 3.50
+                        break
+                    case 'Single CBR':
+                        this.currentOrder.price += 3
+                        break
+                    case 'Soda/Gatorade':
+                        this.currentOrder.price += 1.50
+                        break                    
+                    case 'Ice Cream Sandwich':
+                        this.currentOrder.price += 1.50
+                        break
+
+                }
             }
         },
 
         delItem( item ){
 
-            switch(item){
-                case 'DubBuff':
-                    this.currentOrder.price -= 5
-                    break
-                case 'SingleBuff':
-                    this.currentOrder.price -= 3
-                    break
-                case 'DubBuff - HS':
-                    this.currentOrder.price -= 5
-                    break
-                case 'SingleBuff - HS':
-                    this.currentOrder.price -= 3
-                    break
-                case 'CBR':
-                    this.currentOrder.price -= 5
-                    break
-                case 'Cheese Nachos':
-                    this.currentOrder.price -= 2.50
-                    break
-                case 'Chicken Nachos':
-                    this.currentOrder.price -= 3.50
-                    break
-                case 'Single CBR':
-                    this.currentOrder.price -= 3
-                    break
-                case 'Soda/Gatorade':
-                    this.currentOrder.price -= 1.50
-                    break                    
-                case 'Ice Cream Sandwich':
-                    this.currentOrder.price -= 1.50
-                    break
-                default: //Pizza Rolls
-                    this.currentOrder.price -= (0.25 * this.pizzaRolls)
+            if(!this.hallStaffOrder){
+                switch(item){
+                    case 'DubBuff':
+                        this.currentOrder.price -= 5
+                        break
+                    case 'SingleBuff':
+                        this.currentOrder.price -= 3
+                        break
+                    case 'DubBuff - HS':
+                        this.currentOrder.price -= 5
+                        break
+                    case 'SingleBuff - HS':
+                        this.currentOrder.price -= 3
+                        break
+                    case 'CBR':
+                        this.currentOrder.price -= 5
+                        break
+                    case 'Cheese Nachos':
+                        this.currentOrder.price -= 2.50
+                        break
+                    case 'Chicken Nachos':
+                        this.currentOrder.price -= 3.50
+                        break
+                    case 'Single CBR':
+                        this.currentOrder.price -= 3
+                        break
+                    case 'Soda/Gatorade':
+                        this.currentOrder.price -= 1.50
+                        break                    
+                    case 'Ice Cream Sandwich':
+                        this.currentOrder.price -= 1.50
+                        break
+                    default: //Pizza Rolls
+                        this.currentOrder.price -= (0.25 * this.pizzaRolls)
+                        this.pizzaRolls = 0
+                        this.toggleQuantity = 0
+                        break
+                }
+            } else {
+                //Still Need to check if pizza rolls were deleted
+                let check = item.includes("Pizza Rolls")
+                if(check){
                     this.pizzaRolls = 0
                     this.toggleQuantity = 0
-                    break
+                }
             }
-
             const index = this.currentOrder.items.indexOf(item)
             
             this.currentOrder.items.splice(index,1)
@@ -181,13 +196,17 @@ export default {
                 const index = this.currentOrder.items.indexOf(match)
 
                 const num = Number(this.currentOrder.items[index].slice(0,-11))
-                this.currentOrder.price -= (0.25 * num)
+                if(!this.hallStaffOrder){
+                    this.currentOrder.price -= (0.25 * num)
+                }
 
                 this.currentOrder.items.splice(index,1)
             }
             if(this.pizzaRolls > 0){
                 this.currentOrder.items.push(`${this.pizzaRolls} Pizza Rolls`)
-                this.currentOrder.price += (0.25 * this.pizzaRolls)
+                if(!this.hallStaffOrder){
+                    this.currentOrder.price += (0.25 * this.pizzaRolls)
+                }
             }
 
         },
@@ -198,7 +217,7 @@ export default {
 
             const person = await getDoc(doc(db,"customers",this.currentOrder.name))
 
-            if(person.exists){
+            if(person.data()){
                 this.currentOrder.email = person.data().email
             }
 
@@ -208,6 +227,53 @@ export default {
             await addDoc( ordersCollection, this.currentOrder )
 
         },
+
+        hallStaffCheckBox(){
+
+            //Takes time to model to this.hallStaffOrder so flip the values
+
+            if(!this.hallStaffOrder){
+                this.currentOrder.price = 0
+            } else {
+                for( let i = 0; i < this.currentOrder.items.length; i++ ){
+                    switch(this.currentOrder.items[i]){
+                        case 'DubBuff':
+                            this.currentOrder.price += 5
+                            break
+                        case 'SingleBuff':
+                            this.currentOrder.price += 3
+                            break
+                        case 'DubBuff - HS':
+                            this.currentOrder.price += 5
+                            break
+                        case 'SingleBuff - HS':
+                            this.currentOrder.price += 3
+                            break
+                        case 'CBR':
+                            this.currentOrder.price += 5
+                            break
+                        case 'Cheese Nachos':
+                            this.currentOrder.price += 2.50
+                            break
+                        case 'Chicken Nachos':
+                            this.currentOrder.price += 3.50
+                            break
+                        case 'Single CBR':
+                            this.currentOrder.price += 3
+                            break
+                        case 'Soda/Gatorade':
+                            this.currentOrder.price += 1.50
+                            break                    
+                        case 'Ice Cream Sandwich':
+                            this.currentOrder.price += 1.50
+                            break
+                        default:
+                            this.currentOrder.price += (0.25 * this.pizzaRolls)
+                            break;
+                    }
+                }
+            }
+        }
     },
 
 
@@ -232,6 +298,7 @@ export default {
             modal: false,
             toggleQuantity: false,
             pizzaRolls: null,
+            hallStaffOrder: false,
 
         }
     },
@@ -310,6 +377,14 @@ export default {
   .listItem:hover {
     background: rgb(182, 248, 182);
     font-weight: bold;
+  }
+
+  input[type="checkbox"] {
+    display: inline-block;
+    width: 75px;
+    margin: 0 10px 0 0;
+    position: relative;
+    top: 7px;
   }
 
 </style>

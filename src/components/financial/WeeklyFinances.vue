@@ -25,6 +25,7 @@
                 <tr>
                     <th scope="col">Date</th>
                     <th scope="col">$</th>
+                    <th scope="col">Reason</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,16 +37,21 @@
                         ${{Number(entry.cost).toFixed(2)}}
                     </td>
                     <td>
+                        {{entry.reason}}
+                    </td>
+                    <td>
                       <fa icon="trash-can" @click="delStoreRun( entry.id )" style="color:red; cursor:pointer;"/>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        <label for="dateInput">Date of Store Run</label>
+        <label for="dateInput">Date of Cost</label>
         <input type="date" v-model="storeDate" name="dateInput">
-        <label for="dollarInput">Cost of Store Run</label>
+        <label for="dollarInput">Cost in $</label>
         <input type="number" min="0.01" step="0.01" name="dollarInput" v-model="storeCost">
+        <label for="costInput">Reason for Cost</label>
+        <input type="text" name="costInput" v-model="storeReason">
         <button @click="addStoreRun">Add Cost</button>
 
         <p style="color: red; font-size: 22px;">Weekly Cost: ${{Number(this.$store.state.totalCost).toFixed(2)}}</p>
@@ -141,6 +147,7 @@ export default {
             storeDate: null,
             storeCost: null,
             storeRuns: [],
+            storeReason: "",
             totalCost: 0,
             workerHours: this.combineHours()
         }
@@ -189,12 +196,14 @@ export default {
 
             const newRun = await addDoc(collection(db,"finances",this.$store.state.selectedWeek,"store-runs"),{
                 date: this.storeDate,
-                cost: this.storeCost
+                cost: this.storeCost,
+                reason: this.storeReason
             })
 
             this.$store.dispatch("addStoreRun",{
                 date: this.storeDate,
                 cost: this.storeCost,
+                reason: this.storeReason,
                 id: newRun.id
             })
 
@@ -202,6 +211,7 @@ export default {
 
             this.storeDate = null
             this.storeCost = 0
+            this.storeReason = "-"
         },
 
         async delStoreRun(id){

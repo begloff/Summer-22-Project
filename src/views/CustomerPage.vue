@@ -6,14 +6,19 @@
     <h1>Online Ordering Policy:</h1>
     <li>Online Ordering hours: <b><u>Sun - Thurs from 10:05pm - 11:45pm</u></b></li>
     <li>Online Orders have a <b><u>$0.50 fee</u></b></li>
-    <li>Please <b><u>Venmo @Beggs-_- </u></b>the total listed</li>
+    <li>Please <b><u>Venmo @DuncanGrille</u></b> the total listed</li>
     <li>You will recieve an email when your order is done</li>
     <li>CBR</li>
-    <div style="width: 48%; float: left;">
+    <div style="width: 49%; float: left; margin-right:0.5%;">
         <img src="../assets/grille_boys.jpg" alt="" style="float: right;" width=300 height=300>
     </div>
-    <div style="width: 48%; float: right;">
+    <div style="width: 49%; float: right; margin-left:0.5%;">
         <img src="https://images.squarespace-cdn.com/content/v1/54dfd429e4b0549c366f98dd/1441391694273-GK2IJEZSPW4WPH1U0BBF/Ducnan+Hall+CBR.png?format=1500w" alt="" width=300 height=300 style="float: left;">
+    </div>
+
+    <div style="">
+        <p v-if="$store.state.queue.indexOf($store.state.customer) > -1">Your Order Is {{$store.state.queue.indexOf($store.state.customer) + 1}}/{{$store.state.queue.length}} In the Queue</p>
+        <p v-else>Number of Orders in Queue: {{$store.state.queue.length}}</p>
     </div>
 
     <button @click="toggleOrderModal" :disabled="dayOfWeek > 4 || currentTime.getHours() < 22 || 
@@ -49,7 +54,7 @@ export default {
         },
         toggleSuccess(){
             this.showOrderModal = !this.showOrderModal
-            alert("Successfully submitted order!")
+            alert("Successfully submitted order! Please Venmo @DuncanGrille")
             this.success = true
         }
     },

@@ -51,91 +51,26 @@ export default{
 
 
 <style>
-  #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale; 
-    text-align: center;
-    color: #2c3e50;
-  }
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; 
+  text-align: center;
+  color: #2c3e50;
+}
 
-  h3{
-      padding-top: 50px;
-      font-size: 32pt;
-  }
-  form {
-    margin: 30px auto;
-    background: white;
-    text-align: left;
-    padding: 40px;
-    border-radius: 10px;
-  }
-  label {
-    color: #aaa;
-    display: inline-block;
-    margin: 25px 0 15px;
-    font-size: 0.6em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-  }
-  input, select {
-    display: block;
-    padding: 10px 6px;
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-    border-bottom: 1px solid #ddd;
-    color: #555;
-  }
-  input[type="checkbox"] {
-    display: inline-block;
-    width: 16px;
-    margin: 0 10px 0 0;
-    position: relative;
-    top: 2px;
-  }
-  .pill {
-    display: inline-block;
-    margin: 20px 10px 0 0;
-    padding: 6px 12px;
-    background: #eee;
-    border-radius: 20px;
-    font-size: 12px;
-    letter-spacing: 1px;
-    font-weight: bold;
-    color: #777;
-    cursor: pointer;
-  }
-  button {
-    background: #0b6dff;
-    border: 0;
-    padding: 10px 20px;
-    margin-top: 20px;
-    color: white;
-    border-radius: 20px;
-  }
+nav {
+  padding: 30px;
+}
 
-  img {
-    border-radius: 8px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;  
-  }
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
 
-  nav {
-    padding: 30px;
-  }
-  
-  nav a {
-    font-weight: bold;
-    color: #2c3e50;
-  }
-  
-  nav a.router-link-exact-active {
-    color: #42b983;
-  }
+nav a.router-link-exact-active {
+  color: #42b983;
+}
 
 
 </style>

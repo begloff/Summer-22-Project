@@ -48,9 +48,13 @@
 
             <hr>
 
-            <label for="cash">Cash Order:</label>
-            <input type="checkbox" id="cash" v-model="selectedOrder.cash">
-            <button :disabled="!selectedOrder.price || !selectedOrder.name" @click="updateOrder">Update Order</button>
+            <label for="cash">Cash Order: </label>
+            <input type="checkbox" id="cash" v-model="selectedOrder.cash" style="height: 20px;">
+            <label for="cash">Hall Staff Order: </label>
+            <input type="checkbox" id="cash" v-model="hallStaffOrder" @click="hallStaffCheckBox" style="height: 20px;">
+            <hr>
+
+            <button :disabled="(!selectedOrder.price && !hallStaffOrder)|| !selectedOrder.name" @click="updateOrder">Update Order</button>
 
         </div>
     </div>
@@ -80,7 +84,7 @@ export default {
             }
 
             this.filteredCustomers = this.customers.filter( customer => {
-                return customer.toLowerCase().startsWith(this.selectedOrder.name.toLowerCase());
+                return customer.toLowerCase().includes(this.selectedOrder.name.toLowerCase());
             })
         },
 
@@ -96,79 +100,90 @@ export default {
         addItem( item ){
             this.selectedOrder.items.push(item)
 
-            switch(item){
-                case 'DubBuff':
-                    this.selectedOrder.price += 5
-                    break
-                case 'SingleBuff':
-                    this.selectedOrder.price += 3
-                    break
-                case 'DubBuff - HS':
-                    this.selectedOrder.price += 5
-                    break
-                case 'SingleBuff - HS':
-                    this.selectedOrder.price += 3
-                    break
-                case 'CBR':
-                    this.selectedOrder.price += 5
-                    break
-                case 'Cheese Nachos':
-                    this.selectedOrder.price += 2.50
-                    break
-                case 'Chicken Nachos':
-                    this.selectedOrder.price += 3.50
-                    break
-                case 'Single CBR':
-                    this.selectedOrder.price += 3
-                    break
-                case 'Soda/Gatorade':
-                    this.selectedOrder.price += 1.50
-                    break                    
-                case 'Ice Cream Sandwich':
-                    this.selectedOrder.price += 1.50
-                    break
+            if(!this.hallStaffOrder){
+                switch(item){
+                    case 'DubBuff':
+                        this.selectedOrder.price += 5
+                        break
+                    case 'SingleBuff':
+                        this.selectedOrder.price += 3
+                        break
+                    case 'DubBuff - HS':
+                        this.selectedOrder.price += 5
+                        break
+                    case 'SingleBuff - HS':
+                        this.selectedOrder.price += 3
+                        break
+                    case 'CBR':
+                        this.selectedOrder.price += 5
+                        break
+                    case 'Cheese Nachos':
+                        this.selectedOrder.price += 2.50
+                        break
+                    case 'Chicken Nachos':
+                        this.selectedOrder.price += 3.50
+                        break
+                    case 'Single CBR':
+                        this.selectedOrder.price += 3
+                        break
+                    case 'Soda/Gatorade':
+                        this.selectedOrder.price += 1.50
+                        break                    
+                    case 'Ice Cream Sandwich':
+                        this.selectedOrder.price += 1.50
+                        break
 
+                }
             }
         },
 
         delItem( item ){
 
-            switch(item){
-                case 'DubBuff':
-                    this.selectedOrder.price -= 5
-                    break
-                case 'SingleBuff':
-                    this.selectedOrder.price -= 3
-                    break
-                case 'DubBuff - HS':
-                    this.selectedOrder.price -= 5
-                    break
-                case 'SingleBuff - HS':
-                    this.selectedOrder.price -= 3
-                    break
-                case 'CBR':
-                    this.selectedOrder.price -= 5
-                    break
-                case 'Cheese Nachos':
-                    this.selectedOrder.price -= 2.50
-                    break
-                case 'Chicken Nachos':
-                    this.selectedOrder.price -= 3.50
-                    break
-                case 'Single CBR':
-                    this.selectedOrder.price -= 3
-                    break
-                case 'Soda/Gatorade':
-                    this.selectedOrder.price -= 1.50
-                    break                    
-                case 'Ice Cream Sandwich':
-                    this.selectedOrder.price -= 1.50
-                    break
-                default: //Pizza Rolls
-                    this.selectedOrder.price -= (0.25 * this.pizzaRolls)
+            if(!this.hallStaffOrder){
+                switch(item){
+                    case 'DubBuff':
+                        this.selectedOrder.price -= 5
+                        break
+                    case 'SingleBuff':
+                        this.selectedOrder.price -= 3
+                        break
+                    case 'DubBuff - HS':
+                        this.selectedOrder.price -= 5
+                        break
+                    case 'SingleBuff - HS':
+                        this.selectedOrder.price -= 3
+                        break
+                    case 'CBR':
+                        this.selectedOrder.price -= 5
+                        break
+                    case 'Cheese Nachos':
+                        this.selectedOrder.price -= 2.50
+                        break
+                    case 'Chicken Nachos':
+                        this.selectedOrder.price -= 3.50
+                        break
+                    case 'Single CBR':
+                        this.selectedOrder.price -= 3
+                        break
+                    case 'Soda/Gatorade':
+                        this.selectedOrder.price -= 1.50
+                        break                    
+                    case 'Ice Cream Sandwich':
+                        this.selectedOrder.price -= 1.50
+                        break
+                    default: //Pizza Rolls
+                        this.selectedOrder.price -= (0.25 * this.pizzaRolls)
+                        this.pizzaRolls = 0
+                        this.toggleQuantity = 0
+                        break
+                }
+            } else {
+                //Still Need to check if pizza rolls were deleted
+                let check = item.includes("Pizza Rolls")
+                if(check){
                     this.pizzaRolls = 0
                     this.toggleQuantity = 0
-                    break
+                }
             }
 
             const index = this.selectedOrder.items.indexOf(item)
@@ -184,13 +199,17 @@ export default {
                 const index = this.selectedOrder.items.indexOf(match)
 
                 const num = Number(this.selectedOrder.items[index].slice(0,-11))
-                this.selectedOrder.price -= (0.25 * num)
+                if(!this.hallStaffOrder){
+                    this.selectedOrder.price -= (0.25 * num)
+                }
 
                 this.selectedOrder.items.splice(index,1)
             }
             if(this.pizzaRolls > 0){
                 this.selectedOrder.items.push(`${this.pizzaRolls} Pizza Rolls`)
-                this.selectedOrder.price += (0.25 * this.pizzaRolls)
+                if(!this.hallStaffOrder){
+                    this.selectedOrder.price += (0.25 * this.pizzaRolls)
+                }
             }
 
         },
@@ -199,7 +218,7 @@ export default {
 
             const person = await getDoc(doc(db,"customers",this.selectedOrder.name))
 
-            if(person.exists){
+            if(person.data()){
                 this.selectedOrder.email = person.data().email
             }
 
@@ -222,8 +241,61 @@ export default {
             this.selectedOrder.cash = order.data().cash
             this.selectedOrder.online = order.data().online
             this.selectedOrder.email = order.data().email
-        }
+
+            if(!order.data().price){
+                this.hallStaffOrder = true;
+            }
+        },
+
+        hallStaffCheckBox(){
+
+            //Takes time to model to this.hallStaffOrder so flip the values
+
+            if(!this.hallStaffOrder){
+                this.selectedOrder.price = 0
+            } else {
+                for( let i = 0; i < this.selectedOrder.items.length; i++ ){
+                    switch(this.selectedOrder.items[i]){
+                        case 'DubBuff':
+                            this.selectedOrder.price += 5
+                            break
+                        case 'SingleBuff':
+                            this.selectedOrder.price += 3
+                            break
+                        case 'DubBuff - HS':
+                            this.selectedOrder.price += 5
+                            break
+                        case 'SingleBuff - HS':
+                            this.selectedOrder.price += 3
+                            break
+                        case 'CBR':
+                            this.selectedOrder.price += 5
+                            break
+                        case 'Cheese Nachos':
+                            this.selectedOrder.price += 2.50
+                            break
+                        case 'Chicken Nachos':
+                            this.selectedOrder.price += 3.50
+                            break
+                        case 'Single CBR':
+                            this.selectedOrder.price += 3
+                            break
+                        case 'Soda/Gatorade':
+                            this.selectedOrder.price += 1.50
+                            break                    
+                        case 'Ice Cream Sandwich':
+                            this.selectedOrder.price += 1.50
+                            break
+                        default:
+                            this.selectedOrder.price += (0.25 * this.pizzaRolls)
+                            break;
+                    }
+                }
+            }
+        },
     },
+
+
 
     data(){
         return{
@@ -241,6 +313,7 @@ export default {
             modal: false,
             toggleQuantity: false,
             pizzaRolls: null,
+            hallStaffOrder: false,
 
         }
     }
@@ -318,6 +391,14 @@ export default {
   .listItem:hover {
     background: rgb(182, 248, 182);
     font-weight: bold;
+  }
+
+    input[type="checkbox"] {
+    display: inline-block;
+    width: 75px;
+    margin: 0 10px 0 0;
+    position: relative;
+    top: 7px;
   }
 
 

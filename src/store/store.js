@@ -33,6 +33,7 @@ export default createStore({
     employeeRole: null,
     customer: null,
     customerBase: [],
+    queue: [],
 
   },
   mutations: {
@@ -93,6 +94,9 @@ export default createStore({
     },
     SET_CUSTOMER_BASE(state,payload){
       state.customerBase = payload.sort();
+    },
+    SET_QUEUE(state,payload){
+      state.queue = payload;
     }
   },
 
@@ -211,6 +215,8 @@ export default createStore({
                 }
               } else {
                 if (router.isReady() && router.currentRoute.value.path == '/login'){
+                  const queue = await getDoc(doc(db,"orders","daily-queue"))
+                  commit("SET_QUEUE",queue.data().queue);
                   router.push('/customer')
               }
               }
@@ -237,6 +243,7 @@ export default createStore({
           let cashTotal = 0;
           let venmoTotal = 0;
           let onlineFee = 0;
+          let queue = [];
 
           querySnapshot.forEach( (order) => {
 
@@ -257,11 +264,20 @@ export default createStore({
                 } else {
                   venmoTotal += order.data().price
                 }
-              }              
+              }
+              
+              if( !order.data().done ){
+                queue.push(order.data().name);
+              }
 
           })
 
           let d = new Date
+
+          if(d.getHours() == 23 || d.getHours() == 0){ //Adjusts Minutes so totals reflect previous day rather than the next
+            d.setMinutes(d.getMinutes() - 60);
+          }
+          
           let weekly = (d.getMonth()+ 1) + "-" + d.getDate() + "-totals"
 
           setDoc( doc( db, "finances",weeklyPrefix,"daily-totals",weekly ), {
@@ -271,8 +287,12 @@ export default createStore({
             venmoTotal: venmoTotal,
             totalOrders: orders.length,
             onlineFee: onlineFee,
-            date: d
+            date: new Date()
 
+          });
+
+          setDoc( doc(db,"orders","daily-queue"),{
+            queue: queue,
           });
 
         commit('SET_ORDERS', {o: orders, t: total, of: onlineFee} )
@@ -336,6 +356,7 @@ export default createStore({
         store.push({ 
           date: storeRun.data().date,
           cost: storeRun.data().cost,
+          reason: storeRun.data().reason,
           id: storeRun.id
         })
 
